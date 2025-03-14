@@ -12,18 +12,18 @@ namespace RepositoryLayer.Context
     {
         public UserContext(DbContextOptions<UserContext> options) : base(options) { }
         
-        public DbSet<UserEntity> Users { get; set; }
-        public DbSet<AddressBookEntity> AddressBookEntries { get; set; }
+       // public DbSet<UserEntity> Users { get; set; }
+        public virtual DbSet<AddressBookEntity> AddressBookEntries { get; set; }
 
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
          
-            modelBuilder.Entity<UserEntity>()
-                .HasMany(u => u.AddressBookEntries)
-                .WithOne(a => a.User)
-                .HasForeignKey(a => a.UserId);
-        }
+        //    modelBuilder.Entity<UserEntity>()
+        //        .HasMany(u => u.AddressBookEntries)
+        //        .WithOne(a => a.User)
+        //        .HasForeignKey(a => a.UserId);
+        //}
     }
 }
 
