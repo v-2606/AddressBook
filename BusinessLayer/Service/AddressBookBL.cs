@@ -22,10 +22,11 @@ namespace BusinessLayer.Service
             _mapper = mapper;
         }
 
-        public bool AddContact(AddressBookDTO addressBookDTO)
+        public bool AddContact(AddressBookDTO addressBookDTO , int userId)
         {
             var entity = _mapper.Map<AddressBookEntity>(addressBookDTO);
-            return _addressBookRL.AddContact(entity);
+          
+            return _addressBookRL.AddContact( entity, userId);
         }
 
         public List<AddressBookDTO> GetAllContacts()
@@ -41,10 +42,10 @@ namespace BusinessLayer.Service
             return _mapper.Map<AddressBookDTO>(entity);
         }
 
-        public bool UpdateContact(int id, AddressBookDTO addressBookDTO)
+        public bool UpdateContact(int id, AddressBookDTO addressBookDTO ,int userId)
         {
             var entity = _mapper.Map<AddressBookEntity>(addressBookDTO);
-            return _addressBookRL.UpdateContact(id, entity);
+            return _addressBookRL.UpdateContact(id, entity, userId);
         }
 
 

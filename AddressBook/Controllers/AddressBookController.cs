@@ -2,6 +2,7 @@ using AutoMapper;
 using BusinessLayer.Interface;
 using BusinessLayer.Service;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModelLayer.DTO;
 using ModelLayer.Model;
@@ -27,9 +28,11 @@ namespace AddressBook.Controllers
             _validator = validator;
         }
 
-        [HttpPost("AddContact")]
-        public IActionResult AddContact([FromBody] AddressBookDTO addressBookDTO)
+
+        [HttpPost("AddContact/{userId}")]
+        public IActionResult AddContact( [FromBody] AddressBookDTO addressBookDTO, int userId)
         {
+            // Validate DTO
             var validationResult = _validator.Validate(addressBookDTO);
             if (!validationResult.IsValid)
             {
@@ -41,7 +44,8 @@ namespace AddressBook.Controllers
                 });
             }
 
-            var result = _addressBookBL.AddContact(addressBookDTO);
+            var result = _addressBookBL.AddContact( addressBookDTO, userId);
+
             return Ok(new ResponseModel<bool>
             {
                 Success = result,
@@ -49,6 +53,7 @@ namespace AddressBook.Controllers
                 Data = result
             });
         }
+
 
 
         [HttpGet("GetAllContacts")]
@@ -75,8 +80,8 @@ namespace AddressBook.Controllers
             });
         }
 
-        [HttpPut("UpdateContact/{id}")]
-        public IActionResult UpdateContact(int id, [FromBody] AddressBookDTO addressBookDTO)
+        [HttpPut("UpdateContact/{userId}")]
+        public IActionResult UpdateContact(int id, [FromBody] AddressBookDTO addressBookDTO, int userId)
         {
             var validationResult = _validator.Validate(addressBookDTO);
             if (!validationResult.IsValid)
@@ -89,7 +94,7 @@ namespace AddressBook.Controllers
                 });
             }
 
-            var result = _addressBookBL.UpdateContact(id, addressBookDTO);
+            var result = _addressBookBL.UpdateContact(id, addressBookDTO, userId);
             return Ok(new ResponseModel<bool>
             {
                 Success = result,

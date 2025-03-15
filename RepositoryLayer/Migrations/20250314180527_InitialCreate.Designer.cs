@@ -11,7 +11,7 @@ using RepositoryLayer.Context;
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20250313101828_InitialCreate")]
+    [Migration("20250314180527_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,7 +53,7 @@ namespace RepositoryLayer.Migrations
                     b.ToTable("AddressBookEntries");
                 });
 
-            modelBuilder.Entity("RepositoryLayer.Entity.UserEntity", b =>
+            modelBuilder.Entity("RepositoryLayer.Entity.UsersEntity", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
@@ -65,7 +65,11 @@ namespace RepositoryLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -76,7 +80,7 @@ namespace RepositoryLayer.Migrations
 
             modelBuilder.Entity("RepositoryLayer.Entity.AddressBookEntity", b =>
                 {
-                    b.HasOne("RepositoryLayer.Entity.UserEntity", "User")
+                    b.HasOne("RepositoryLayer.Entity.UsersEntity", "User")
                         .WithMany("AddressBookEntries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -85,7 +89,7 @@ namespace RepositoryLayer.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("RepositoryLayer.Entity.UserEntity", b =>
+            modelBuilder.Entity("RepositoryLayer.Entity.UsersEntity", b =>
                 {
                     b.Navigation("AddressBookEntries");
                 });
