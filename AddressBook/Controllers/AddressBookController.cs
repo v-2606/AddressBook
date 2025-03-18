@@ -16,7 +16,6 @@ namespace AddressBook.Controllers
     public class AddressBookController : ControllerBase
     {
 
-
         private readonly IAddressBookBL _addressBookBL;
         private readonly IMapper _mapper;
         private readonly IValidator<AddressBookDTO> _validator;
@@ -28,11 +27,14 @@ namespace AddressBook.Controllers
             _validator = validator;
         }
 
-
-        [HttpPost("AddContact/{userId}")]
-        public IActionResult AddContact( [FromBody] AddressBookDTO addressBookDTO, int userId)
+        [Authorize]
+        [HttpPost("AddContact")]
+        public IActionResult AddContact([FromBody] AddressBookDTO addressBookDTO)
         {
-            // Validate DTO
+            
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+
+            
             var validationResult = _validator.Validate(addressBookDTO);
             if (!validationResult.IsValid)
             {
@@ -44,7 +46,8 @@ namespace AddressBook.Controllers
                 });
             }
 
-            var result = _addressBookBL.AddContact( addressBookDTO, userId);
+           
+            var result = _addressBookBL.AddContact(addressBookDTO, userId);
 
             return Ok(new ResponseModel<bool>
             {
@@ -55,11 +58,13 @@ namespace AddressBook.Controllers
         }
 
 
+        [Authorize]
 
         [HttpGet("GetAllContacts")]
         public IActionResult GetAllContacts()
         {
-            var data = _addressBookBL.GetAllContacts();
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+            var data = _addressBookBL.GetAllContacts(userId);
             return Ok(new ResponseModel<List<AddressBookDTO>>
             {
                 Success = true,
@@ -68,10 +73,13 @@ namespace AddressBook.Controllers
             });
         }
 
+        [Authorize]
         [HttpGet("GetContactById/{id}")]
         public IActionResult GetContactById(int id)
         {
-            var data = _addressBookBL.GetContactById(id);
+            var userId = int.Parse(User.FindFirst("UserId").Value); 
+            var data = _addressBookBL.GetContactById(id, userId);
+
             return Ok(new ResponseModel<AddressBookDTO>
             {
                 Success = data != null,
@@ -80,9 +88,15 @@ namespace AddressBook.Controllers
             });
         }
 
-        [HttpPut("UpdateContact/{userId}")]
-        public IActionResult UpdateContact(int id, [FromBody] AddressBookDTO addressBookDTO, int userId)
+
+        [Authorize]
+        [HttpPut("UpdateContact/{id}")]
+        public IActionResult UpdateContact(int id, [FromBody] AddressBookDTO addressBookDTO)
         {
+          
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+
+            
             var validationResult = _validator.Validate(addressBookDTO);
             if (!validationResult.IsValid)
             {
@@ -94,6 +108,7 @@ namespace AddressBook.Controllers
                 });
             }
 
+          
             var result = _addressBookBL.UpdateContact(id, addressBookDTO, userId);
             return Ok(new ResponseModel<bool>
             {
@@ -103,16 +118,22 @@ namespace AddressBook.Controllers
         }
 
 
+
+        [Authorize]
         [HttpDelete("DeleteContact/{id}")]
         public IActionResult DeleteContact(int id)
         {
-            var result = _addressBookBL.DeleteContact(id);
+          
+            var userId = int.Parse(User.FindFirst("UserId").Value);
+
+            var result = _addressBookBL.DeleteContact(id, userId);
             return Ok(new ResponseModel<bool>
             {
                 Success = result,
                 Message = result ? "Contact deleted successfully" : "Failed to delete contact"
             });
         }
+
     }
 
 }

@@ -17,12 +17,14 @@ namespace BussinessLayer.Service
         private readonly IUserRL _userRL;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public UserBL(IUserRL userRL, IMapper mapper, IConfiguration configuration)
+        public UserBL(IUserRL userRL, IMapper mapper, IConfiguration configuration, IEmailService emailService)
         {
             _userRL = userRL;
             _mapper = mapper;
             _configuration = configuration;
+            _emailService = emailService;
         }
 
 
@@ -75,6 +77,38 @@ namespace BussinessLayer.Service
             return tokenHandler.WriteToken(token);
         }
 
+        public bool ForgotPassword(ForgotPasswordDTO forgotPasswordDTO)
+        {
+            if (_userRL.CheckEmail(forgotPasswordDTO))
+            {
+                var user = _userRL.GetUserByEmail(forgotPasswordDTO);
+
+               
+                string token = Guid.NewGuid().ToString();
+                DateTime expiryTime = DateTime.Now.AddMinutes(3);
+
+                
+                _userRL.SaveResetToken(user.UserId, token, expiryTime);
+
+                string resetLink = $"https://V.com/resetpassword?token={token}";
+                string subject = "Password Reset Request";
+                string body = token;
+                bool emailSent = _emailService.SendEmail(user.Email, subject, body);
+                return emailSent;
+            }
+            return false;
+        }
+
+        public bool ResetPassword(ResetPasswordDTO resetPasswordDTO)
+        {
+            var user = _userRL.GetUserByToken(resetPasswordDTO.Token);
+            if (user != null && resetPasswordDTO.NewPassword == resetPasswordDTO.ConfirmPassword)
+            {
+                string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDTO.NewPassword);
+                return _userRL.UpdatePassword(user.UserId, newPasswordHash);
+            }
+            return false;
+        }
 
     }
 }

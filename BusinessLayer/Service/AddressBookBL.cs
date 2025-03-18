@@ -25,33 +25,34 @@ namespace BusinessLayer.Service
         public bool AddContact(AddressBookDTO addressBookDTO , int userId)
         {
             var entity = _mapper.Map<AddressBookEntity>(addressBookDTO);
-          
-            return _addressBookRL.AddContact( entity, userId);
+            entity.UserId = userId;
+            return _addressBookRL.AddContact( entity);
         }
 
-        public List<AddressBookDTO> GetAllContacts()
+        public List<AddressBookDTO> GetAllContacts(int userId)
         {
-            var entityList = _addressBookRL.GetAllContacts();
+            var entityList = _addressBookRL.GetAllContacts( userId);
             return _mapper.Map<List<AddressBookDTO>>(entityList);
         }
 
 
-        public AddressBookDTO GetContactById(int id)
+        public AddressBookDTO GetContactById(int contactId, int userId)
         {
-            var entity = _addressBookRL.GetContactById(id);
+            var entity = _addressBookRL.GetContactById(contactId, userId);
             return _mapper.Map<AddressBookDTO>(entity);
         }
 
-        public bool UpdateContact(int id, AddressBookDTO addressBookDTO ,int userId)
+        public bool UpdateContact(int contactId, AddressBookDTO addressBookDTO ,int userId)
         {
             var entity = _mapper.Map<AddressBookEntity>(addressBookDTO);
-            return _addressBookRL.UpdateContact(id, entity, userId);
+            return _addressBookRL.UpdateContact(contactId, entity, userId);
         }
 
 
-        public bool DeleteContact(int id)
+        public bool DeleteContact(int contactId, int userId)
         {
-            return _addressBookRL.DeleteContact(id);
+            return _addressBookRL.DeleteContact(contactId, userId);
         }
+
     }
 }

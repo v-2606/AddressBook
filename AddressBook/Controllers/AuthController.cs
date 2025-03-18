@@ -35,7 +35,7 @@ namespace AddressBook.Controllers
 
             var isRegistered = _userBL.Register(registerDTO);
 
-            // Step 3: Return appropriate response based on result
+            
             if (!isRegistered)
             {
                 return Conflict(new ResponseModel<string>
@@ -75,5 +75,28 @@ namespace AddressBook.Controllers
                 Data = token
             });
         }
+
+        [HttpPost("ForgotPassword")]
+        public IActionResult ForgotPassword([FromBody] ForgotPasswordDTO forgotPasswordDTO)
+        {
+            var result = _userBL.ForgotPassword(forgotPasswordDTO);
+            return Ok(new ResponseModel<bool>
+            {
+                Success = result,
+                Message = result ? "Password reset link sent to your email." : "Email not found"
+            });
+        }
+
+        [HttpPost("ResetPassword")]
+        public IActionResult ResetPassword([FromBody] ResetPasswordDTO model)
+        {
+            var result = _userBL.ResetPassword(model);
+            return Ok(new ResponseModel<bool>
+            {
+                Success = result,
+                Message = result ? "Password reset successful" : "Invalid or expired token"
+            });
+        }
+
     }
 }

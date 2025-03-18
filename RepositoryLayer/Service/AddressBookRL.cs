@@ -21,53 +21,65 @@ namespace RepositoryLayer
             _context = context;
         }
 
-        public bool AddContact(AddressBookEntity contact, int userId)
+        public bool AddContact(AddressBookEntity contact)
         {
-            contact.UserId = userId;
+            
             _context.AddressBookEntries.Add(contact);
             _context.SaveChanges();
             return true;
         }
 
-        public List<AddressBookEntity> GetAllContacts()
+        public List<AddressBookEntity> GetAllContacts(int userId)
         {
-            return _context.AddressBookEntries.ToList();
+            return _context.AddressBookEntries
+                           .Where(contact => contact.UserId == userId) 
+                           .ToList();
         }
 
-        public AddressBookEntity GetContactById(int id)
+        public AddressBookEntity GetContactById(int contactId, int userId)
         {
-            return _context.AddressBookEntries.FirstOrDefault(c => c.Id == id);
+            return _context.AddressBookEntries
+                           .FirstOrDefault(c => c.Id == contactId && c.UserId == userId);
         }
 
-        public bool UpdateContact(int id, AddressBookEntity contact, int userId)
+
+        public bool UpdateContact(int contactId, AddressBookEntity updatedContact, int userId)
         {
+            
             var existingContact = _context.AddressBookEntries
-                                           .FirstOrDefault(c => c.Id == id && c.UserId == userId);
+                                          .FirstOrDefault(c => c.Id == contactId && c.UserId == userId);
 
             if (existingContact != null)
             {
-                existingContact.Name = contact.Name;
-                existingContact.Email = contact.Email;
-                existingContact.Phone = contact.Phone;
+               
+                existingContact.Name = updatedContact.Name;
+                existingContact.Email = updatedContact.Email;
+                existingContact.Phone = updatedContact.Phone;
 
-                _context.SaveChanges();
+                _context.SaveChanges(); 
                 return true;
             }
-            return false;
+            return false; 
         }
 
 
-        public bool DeleteContact(int id)
+
+
+        public bool DeleteContact(int contactId, int userId)
         {
-            var contact = _context.AddressBookEntries.Find(id);
+          
+            var contact = _context.AddressBookEntries
+                                  .FirstOrDefault(c => c.Id == contactId && c.UserId == userId);
+
             if (contact != null)
             {
-                _context.AddressBookEntries.Remove(contact);
-                _context.SaveChanges();
+                _context.AddressBookEntries.Remove(contact); 
+                _context.SaveChanges(); 
                 return true;
             }
-            return false;
+            return false; 
         }
+
     }
 }
 

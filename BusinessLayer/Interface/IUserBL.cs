@@ -14,6 +14,10 @@ namespace BussinessLayer.Interface
         
         string Login(LoginDTO loginDTO);
 
-       
+        bool ForgotPassword(ForgotPasswordDTO forgotPasswordDTO);
+        bool ResetPassword(ResetPasswordDTO resetPasswordDTO);
+
+
+
     }
 }

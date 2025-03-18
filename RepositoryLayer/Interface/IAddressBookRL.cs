@@ -11,10 +11,10 @@ namespace RepositoryLayer.Interface
 public interface IAddressBookRL
     {
 
-        bool AddContact(AddressBookEntity contact, int userId);
-        List<AddressBookEntity> GetAllContacts();
-        AddressBookEntity GetContactById(int id);
+        bool AddContact(AddressBookEntity contact);
+        List<AddressBookEntity> GetAllContacts(int userId);
+        AddressBookEntity GetContactById(int contactId,int id);
         bool UpdateContact(int id, AddressBookEntity updatedContact, int userId);
-        bool DeleteContact(int id);
+        bool DeleteContact(int contactId, int id);
     }
 }
