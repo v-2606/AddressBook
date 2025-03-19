@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using ModelLayer.DTO;
 using StackExchange.Redis;
+using RabbitMQLayer.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +64,10 @@ builder.Services.AddSingleton<RedisCacheService>();
 var connectionString = builder.Configuration.GetConnectionString("SqlConnection");
 builder.Services.AddDbContext<UserContext>(options => options.UseSqlServer(connectionString));
 
+
+// RabbitMQ Dependencies (Event Publisher and Consumer)
+builder.Services.AddSingleton<IEventPublisher, EventPublisher>();
+builder.Services.AddHostedService<RabbitMQConsumer>();
 
 var app = builder.Build();
 

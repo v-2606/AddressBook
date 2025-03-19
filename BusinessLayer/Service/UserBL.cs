@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using RabbitMQLayer.Interface;
 
 namespace BussinessLayer.Service
 {
@@ -18,13 +19,15 @@ namespace BussinessLayer.Service
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
+       private readonly IEventPublisher _eventPublisher;
 
-        public UserBL(IUserRL userRL, IMapper mapper, IConfiguration configuration, IEmailService emailService)
+        public UserBL(IUserRL userRL, IMapper mapper, IConfiguration configuration, IEmailService emailService, IEventPublisher eventPublisher)
         {
             _userRL = userRL;
             _mapper = mapper;
             _configuration = configuration;
             _emailService = emailService;
+            _eventPublisher = eventPublisher;
         }
 
 
@@ -40,7 +43,14 @@ namespace BussinessLayer.Service
           
             var userEntity = _mapper.Map<UsersEntity>(userDTO);
             userEntity.Password = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
-            return _userRL.Register(userEntity);
+            bool isRegistered = _userRL.Register(userEntity);
+            if (isRegistered)
+            {
+              
+                _eventPublisher.PublishEvent("user.registered", new { userDTO.Email, userEntity.UserId });
+            }
+
+            return isRegistered;
         }
 
 
@@ -94,6 +104,12 @@ namespace BussinessLayer.Service
                 string subject = "Password Reset Request";
                 string body = token;
                 bool emailSent = _emailService.SendEmail(user.Email, subject, body);
+                if (emailSent)
+                {
+                  
+                    _eventPublisher.PublishEvent("user.forgotpassword", new { user.Email, Token = token });
+                }
+
                 return emailSent;
             }
             return false;
@@ -105,7 +121,15 @@ namespace BussinessLayer.Service
             if (user != null && resetPasswordDTO.NewPassword == resetPasswordDTO.ConfirmPassword)
             {
                 string newPasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordDTO.NewPassword);
-                return _userRL.UpdatePassword(user.UserId, newPasswordHash);
+                bool isUpdated = _userRL.UpdatePassword(user.UserId, newPasswordHash);
+
+                if (isUpdated)
+                {
+                    
+                    _eventPublisher.PublishEvent("user.passwordreset", new { user.Email });
+                }
+
+                return isUpdated;
             }
             return false;
         }
