@@ -69,6 +69,11 @@ builder.Services.AddDbContext<UserContext>(options => options.UseSqlServer(conne
 builder.Services.AddSingleton<IEventPublisher, EventPublisher>();
 builder.Services.AddHostedService<RabbitMQConsumer>();
 
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,6 +82,11 @@ app.UseHttpsRedirection();
 
 
 app.UseRouting();
+
+//Swagger Enable
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthentication();
 app.UseAuthorization();
